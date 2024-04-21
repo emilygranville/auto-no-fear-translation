@@ -1,0 +1,1 @@
+These pretrained embeddings are processed from the embeddings from the dictionary mappings that Jhamtani et al. created in their research.
