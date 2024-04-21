@@ -1,0 +1,1 @@
+These are the aligned sentences from Wikipedia and Simple Wikipedia that William Coster and David Kauchak created in their research. 
