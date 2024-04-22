@@ -4,6 +4,7 @@ import sys
 import numpy as np
 maxInt = sys.maxsize
 
+# from https://stackoverflow.com/questions/15063936/csv-error-field-larger-than-field-limit-131072
 while True:
     try:
         csv.field_size_limit(maxInt)
