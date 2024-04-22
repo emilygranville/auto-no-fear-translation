@@ -33,13 +33,9 @@ def get_word_embeddings(f_name) -> dict:
     for item in embed_list:
         embed = item["embeddings"].replace("[", "").replace("]", "").replace(";", "\n")
         new_array = np.fromstring(embed, sep="\n", dtype="float64")
-        item["embeddings"] = new_array
         
         new_dictionary[item["word"]] = new_array
-        if item["word"] == "fawn":
-            print(new_dictionary["fawn"])
         
     return new_dictionary
 
 embeddings = get_word_embeddings(data_dir + embed_dir + "pretrained-embeddings.csv")
-#print(embeddings["fawn"])
