@@ -13,6 +13,9 @@ def get_sent_dict(f_name) -> list[dict]:
         return list(reader)
 
 def get_sent_tuples (combined_sent: list[dict]) -> list[tuple]:
+    ''' given the result of get_sent_dict, creates tuples of the
+        normal (source) sents and the simple (target) sents
+    '''
     new_list = []
     for item in combined_sent:
         normal = item[0]["sentence"]
