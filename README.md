@@ -1,6 +1,12 @@
 # auto-no-fear-translation
 
 ## Works Cited
+
+Making a transformer:
+PyTorch Team. PyTorch.
+
+Specifically this tutorial: [https://pytorch.org/tutorials/beginner/translation_transformer.html](https://pytorch.org/tutorials/beginner/translation_transformer.html)
+
 Pretrained embeddings:
 
 Harsh Jhamtani, Varun Gangal, Eduard Hovy, and Eric Nyberg. 2017. [Shakespearizing modern language using copy-enriched sequence to sequence models](https://aclanthology.org/W17-4902/). In Proceedings of the Workshop on Stylistic Variation, pages 10–19, Copenhagen, Denmark. Association for Computational Linguistics.
