@@ -276,7 +276,7 @@ TGT_VOCAB_SIZE = len(vocab_transform[TGT_LANGUAGE])
 EMB_SIZE = 512
 NHEAD = 8
 FFN_HID_DIM = 512
-BATCH_SIZE = 128
+BATCH_SIZE = 24
 NUM_ENCODER_LAYERS = 3
 NUM_DECODER_LAYERS = 3
 
@@ -412,7 +412,7 @@ def evaluate(model):
 """
 
 from timeit import default_timer as timer
-NUM_EPOCHS = 18
+NUM_EPOCHS = 5
 
 for epoch in range(1, NUM_EPOCHS+1):
     start_time = timer()
@@ -456,7 +456,7 @@ def translate(model: torch.nn.Module, src_sentence: str):
         model,  src, src_mask, max_len=num_tokens + 5, start_symbol=BOS_IDX).flatten()
     return " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(tgt_tokens.cpu().numpy()))).replace("<bos>", "").replace("<eos>", "")
 
-print(translate(transformer, "Eine Gruppe von Menschen steht vor einem Iglu ."))
+print(translate(transformer, "It is the county seat of Alfalfa County ."))
 
 """References
 ==========
