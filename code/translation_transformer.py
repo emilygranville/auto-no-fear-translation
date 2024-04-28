@@ -38,6 +38,8 @@ To access torchtext datasets, please install torchdata following
 instructions at <https://github.com/pytorch/data>.
 """
 
+# from https://pytorch.org/tutorials/beginner/translation_transformer.html
+
 #!/usr/bin/python
 
 from torchtext.data.utils import get_tokenizer
@@ -80,10 +82,9 @@ python -m spacy download de_core_news_sm
 
 # it tokenizes it. the 'spacy' is the tokenizer function and I believe the language just helps clarify what language rules to follow
 # default language is en so i think we can just roll with that for both of ours, thankfully.... hopefully
-token_transform[SRC_LANGUAGE] = align.give_tokens(SRC_LANGUAGE)
-token_transform[TGT_LANGUAGE] = align.give_tokens(TGT_LANGUAGE)
+token_transform[SRC_LANGUAGE] = get_tokenizer(tokenizer=None)
+token_transform[TGT_LANGUAGE] = get_tokenizer(tokenizer=None)
 
-'''
 # helper function to yield list of tokens
 def yield_tokens(data_iter: Iterable, language: str) -> List[str]:
     # creates an index
@@ -93,7 +94,7 @@ def yield_tokens(data_iter: Iterable, language: str) -> List[str]:
 # could've just initalized a list and continually appended i think
     for data_sample in data_iter:
         yield token_transform[language](data_sample[language_index[language]])
-'''
+
 # got it. https://github.com/nicolas-ivanov/tf_seq2seq_chatbot/issues/15
 # unknown, padding, bos (beginning of sentence?), end of sentence
 # Define special symbols and indices
@@ -107,11 +108,12 @@ for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
     # train_iter
     # just taking part of the data set (training, so vast majority) and making it into tuples
     # train_iter = Multi30k(split='train', language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
+    train_iter = align.sent_pairs("train")
     # Create torchtext's Vocab object
     # googling it might be helpful but it is just creating a Vocab Object and being given an iterator
     # (special first is just asking do we have start and end symbols and the answer here is yes... is it yes for us?)
     # is it yes for us -> probably? it would make it easier to mark beginning of sentence if needed
-    vocab_transform[ln] = build_vocab_from_iterator(token_transform[ln],
+    vocab_transform[ln] = build_vocab_from_iterator(yield_tokens(train_iter, ln),
                                                     min_freq=1,
                                                     specials=special_symbols,
                                                     special_first=True)
@@ -355,7 +357,8 @@ from torch.utils.data import DataLoader
 def train_epoch(model, optimizer):
     model.train()
     losses = 0
-    train_iter = Multi30k(split='train', language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
+    #train_iter = Multi30k(split='train', language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
+    train_iter = align.sent_pairs("train")
     train_dataloader = DataLoader(train_iter, batch_size=BATCH_SIZE, collate_fn=collate_fn)
 
     for src, tgt in train_dataloader:
@@ -384,7 +387,8 @@ def evaluate(model):
     model.eval()
     losses = 0
 
-    val_iter = Multi30k(split='valid', language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
+    #val_iter = Multi30k(split='valid', language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
+    val_iter = align.sent_pairs("valid")
     val_dataloader = DataLoader(val_iter, batch_size=BATCH_SIZE, collate_fn=collate_fn)
 
     for src, tgt in val_dataloader:
