@@ -12,6 +12,14 @@ def get_sent_dict(f_name) -> list[dict]:
         reader = csv.DictReader(csvfile, fieldnames=["article_title","paragraph_number","sentence"], delimiter="\t")
         return list(reader)
 
+def get_sents(dictionary: list[dict]) -> list[str]:
+    ''' creates a list of just the sentences from the dictionary list
+    '''
+    sent_list = []
+    for item in dictionary:
+        sent_list.append(item["sentence"])
+    return sent_list
+
 def get_sent_tuples (combined_sent: list[dict]) -> list[tuple]:
     ''' given the result of get_sent_dict, creates tuples of the
         normal (source) sents and the simple (target) sents
@@ -23,11 +31,19 @@ def get_sent_tuples (combined_sent: list[dict]) -> list[tuple]:
         new_list.append((normal, simple))
     return new_list
 
+def tokenize_sents (sents: list[str]) -> list[list[str]]:
+    ''' given a list of sentences, returns a list of token lists
+    '''
+    list_sent = []
+    for sent in sents:
+        list_sent.append(sent.split(" "))
+    return list_sent
 
 normal_sents = get_sent_dict(data_dir + simple_eng_dir + "normal.aligned")
 simple_sents = get_sent_dict(data_dir + simple_eng_dir + "simple.aligned")
-#print(len(normal_sents))
-#print(len(simple_sents))
-combined_sents = list(zip(normal_sents, simple_sents))
-print(combined_sents[0])
-print(get_sent_tuples(combined_sents)[0])
+
+#combined_sents = list(zip(normal_sents, simple_sents))
+
+normal_tokens = tokenize_sents(get_sents(normal_sents))
+simple_tokens = tokenize_sents(get_sents(simple_sents))
+combined_tokens = list(zip(normal_tokens, simple_tokens))
