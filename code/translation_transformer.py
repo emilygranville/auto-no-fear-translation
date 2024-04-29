@@ -303,7 +303,7 @@ def make_or_restore_model():
         return transformer, optimizer, epoch + 1
     else:
         print("Creating a new model")
-        return transformer, optimizer, 0
+        return transformer, optimizer, 1
 
 torch.manual_seed(0)
 
@@ -322,7 +322,7 @@ NUM_DECODER_LAYERS = 3
 
 loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 
-transformer, optimizer, epoch_start = make_or_restore_model()
+transformer, optimizer, next_epoch = make_or_restore_model()
 
 """Collation
 =========
@@ -444,8 +444,7 @@ def evaluate(model):
 from timeit import default_timer as timer
 NUM_EPOCHS = 3
 
-#delete +1?
-for epoch in range(1, (NUM_EPOCHS - epoch_start)+1):
+for epoch in range(next_epoch, NUM_EPOCHS+1):
     start_time = timer()
     train_loss = train_epoch(transformer, optimizer)
     end_time = timer()
