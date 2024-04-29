@@ -1,7 +1,13 @@
 import csv
+import random
+import math
 
-data_dir = "data/"
-simple_eng_dir = "simple-english/"
+DATA_DIR = "data/"
+SIMPLE_ENGL_DIR = "simple-english/"
+
+TRAIN_PERCENT = .8
+NON_TRAIN_PERCENT = .1
+RAND_SEED = 0
 
 def get_sent_dict(f_name) -> list[dict]:
     ''' gets the aligned file and converts it to a list of dictionaries
@@ -20,7 +26,7 @@ def get_sents(dictionary: list[dict]) -> list[str]:
         sent_list.append(item["sentence"])
     return sent_list
 
-def get_sent_tuples (combined_sent: list[dict]) -> list[tuple]:
+def get_sent_tuples(combined_sent: list[dict]) -> list[tuple]:
     ''' given the result of get_sent_dict, creates tuples of the
         normal (source) sents and the simple (target) sents
     '''
@@ -31,7 +37,7 @@ def get_sent_tuples (combined_sent: list[dict]) -> list[tuple]:
         new_list.append((normal, simple))
     return new_list
 
-def tokenize_sents (sents: list[str]) -> list[list[str]]:
+def tokenize_sents(sents: list[str]) -> list[list[str]]:
     ''' given a list of sentences, returns a list of token lists
     '''
     list_sent = []
@@ -39,11 +45,53 @@ def tokenize_sents (sents: list[str]) -> list[list[str]]:
         list_sent.append(sent.split(" "))
     return list_sent
 
-normal_sents = get_sent_dict(data_dir + simple_eng_dir + "normal.aligned")
-simple_sents = get_sent_dict(data_dir + simple_eng_dir + "simple.aligned")
+# partially from https://pytorch.org/text/stable/vocab.html#torchtext.vocab.vocab
+def create_token_count(token_list_list: list[list[str]]) -> dict:
+    total_list = []
+    for sent in token_list_list:
+        for token in sent:
+            total_list.append(token)
+    return Counter(total_list)
 
-#combined_sents = list(zip(normal_sents, simple_sents))
+def create_giant_token_list(token_list_list: list[list[str]]) -> list[str]:
+    ''' creates a giant list of all the tokens in the entire set of sentences
+    '''
+    total_list = []
+    for sent in token_list_list:
+        for token in sent:
+            total_list.append(token)
+    return total_list
 
-normal_tokens = tokenize_sents(get_sents(normal_sents))
-simple_tokens = tokenize_sents(get_sents(simple_sents))
-combined_tokens = list(zip(normal_tokens, simple_tokens))
+def give_tokens(lang: str) -> list[str]:
+    '''creates the tokens in a way that the transformer can use it
+    '''
+    if lang == "en":
+        normal_sents = get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + "normal.aligned")
+        normal_tokens = tokenize_sents(get_sents(normal_sents))
+        all_normal_tokens = create_giant_token_list(normal_tokens)
+        return all_normal_tokens
+    elif lang == "simple":
+        simple_sents = get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + "simple.aligned")
+        simple_tokens = tokenize_sents(get_sents(simple_sents))
+        all_simple_tokens = create_giant_token_list(simple_tokens)
+        return all_simple_tokens
+    else:
+        print("Error")
+
+def sent_pairs(split: str) -> list[(str, str)]:
+    ''' creates sents pairs with the source first and target second
+    '''
+    normal_sents = get_sents(get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + "normal.aligned"))
+    simple_sents = get_sents(get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + "simple.aligned"))
+    entire_list = list(zip(normal_sents, simple_sents))
+    random.Random(RAND_SEED).shuffle(entire_list)
+    
+    train_len = math.floor(len(entire_list) * TRAIN_PERCENT)
+    non_train_len = train_len + math.floor(len(entire_list) * NON_TRAIN_PERCENT)
+
+    if split == "train":
+        return entire_list[:train_len]
+    elif split == "valid":
+        return entire_list[train_len:non_train_len]
+    else:
+        return entire_list[non_train_len:]

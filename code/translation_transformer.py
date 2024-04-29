@@ -40,14 +40,14 @@ instructions at <https://github.com/pytorch/data>.
 
 # from https://pytorch.org/tutorials/beginner/translation_transformer.html
 
-#!/usr/bin/python
-
+import torch
 from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 #from torchtext.datasets import multi30k, Multi30k
 from typing import Iterable, List
 from spacy.lang.en import English
 import english_simple_sent_align as align
+import os
 
 
 # We need to modify the URLs for the dataset since the links to the original dataset are broken
@@ -57,8 +57,7 @@ import english_simple_sent_align as align
 #multi30k.URL["train"] = "https://raw.githubusercontent.com/neychev/small_DL_repo/master/datasets/Multi30k/training.tar.gz"
 #multi30k.URL["valid"] = "https://raw.githubusercontent.com/neychev/small_DL_repo/master/datasets/Multi30k/validation.tar.gz"
 
-nlp = English(pipeline=[])
-nlp.add_pipe("sentencizer")
+CKPT_DIR = "./code/ckpt"
 
 SRC_LANGUAGE = "en"
 TGT_LANGUAGE = "simple"
@@ -67,6 +66,8 @@ TGT_LANGUAGE = "simple"
 # Place-holders
 token_transform = {}
 vocab_transform = {}
+
+TRAIN_STR = "train" # make sure that the list is also shuffled before chaging back to "train" (in sent_pairs)
 
 """Create source and target language tokenizer. Make sure to install the
 dependencies.
@@ -102,13 +103,14 @@ UNK_IDX, PAD_IDX, BOS_IDX, EOS_IDX = 0, 1, 2, 3
 # Make sure the tokens are in order of their indices to properly insert them in vocab
 special_symbols = ['<unk>', '<pad>', '<bos>', '<eos>']
 
+train_iter = align.sent_pairs(TRAIN_STR)
+
 for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
     # Training data Iterator
     # create a train dataset, of a certain number of sentence tuples. then iterate through it. shuffle then split.
     # train_iter
     # just taking part of the data set (training, so vast majority) and making it into tuples
     # train_iter = Multi30k(split='train', language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
-    train_iter = align.sent_pairs("train")
     # Create torchtext's Vocab object
     # googling it might be helpful but it is just creating a Vocab Object and being given an iterator
     # (special first is just asking do we have start and end symbols and the answer here is yes... is it yes for us?)
@@ -265,6 +267,44 @@ and the optimizer used for training.
 
 """
 
+''' adapted from from Vassar CMPU 366 Assignment 5, 
+    which was adapted from an assignment developed by 
+    Carolyn Anderson, Wellesley College.
+'''
+def make_or_restore_model():
+    ''' recreates model based on saved versions in case of not being able to complete
+        training in one go
+    '''
+    transformer = Seq2SeqTransformer(NUM_ENCODER_LAYERS, NUM_DECODER_LAYERS, EMB_SIZE,
+                                    NHEAD, SRC_VOCAB_SIZE, TGT_VOCAB_SIZE, FFN_HID_DIM)
+
+    for p in transformer.parameters():
+        if p.dim() > 1:
+            nn.init.xavier_uniform_(p)
+
+    transformer = transformer.to(DEVICE)
+
+    optimizer = torch.optim.Adam(transformer.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
+
+    checkpoints = [
+        CKPT_DIR + "/" + name
+        for name in os.listdir(CKPT_DIR)
+        if name[-1] == "t"
+    ]
+
+    if checkpoints:
+        latest_checkpoint = max(checkpoints, key=os.path.getctime)
+
+        print("Restoring from", latest_checkpoint)
+        ckpt = torch.load(latest_checkpoint)
+        transformer.load_state_dict(ckpt["model_state_dict"])
+        optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+        epoch = ckpt["epoch"]
+        return transformer, optimizer, epoch + 1
+    else:
+        print("Creating a new model")
+        return transformer, optimizer, 0
+
 torch.manual_seed(0)
 
 # btw took me too long to get that SRC was source and TGT is target
@@ -280,18 +320,9 @@ BATCH_SIZE = 24
 NUM_ENCODER_LAYERS = 3
 NUM_DECODER_LAYERS = 3
 
-transformer = Seq2SeqTransformer(NUM_ENCODER_LAYERS, NUM_DECODER_LAYERS, EMB_SIZE,
-                                 NHEAD, SRC_VOCAB_SIZE, TGT_VOCAB_SIZE, FFN_HID_DIM)
-
-for p in transformer.parameters():
-    if p.dim() > 1:
-        nn.init.xavier_uniform_(p)
-
-transformer = transformer.to(DEVICE)
-
 loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 
-optimizer = torch.optim.Adam(transformer.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
+transformer, optimizer, epoch_start = make_or_restore_model()
 
 """Collation
 =========
@@ -358,7 +389,6 @@ def train_epoch(model, optimizer):
     model.train()
     losses = 0
     #train_iter = Multi30k(split='train', language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
-    train_iter = align.sent_pairs("train")
     train_dataloader = DataLoader(train_iter, batch_size=BATCH_SIZE, collate_fn=collate_fn)
 
     for src, tgt in train_dataloader:
@@ -379,7 +409,7 @@ def train_epoch(model, optimizer):
 
         optimizer.step()
         losses += loss.item()
-
+    
     return losses / len(list(train_dataloader))
 
 
@@ -412,14 +442,25 @@ def evaluate(model):
 """
 
 from timeit import default_timer as timer
-NUM_EPOCHS = 5
+NUM_EPOCHS = 3
 
-for epoch in range(1, NUM_EPOCHS+1):
+#delete +1?
+for epoch in range(1, (NUM_EPOCHS - epoch_start)+1):
     start_time = timer()
     train_loss = train_epoch(transformer, optimizer)
     end_time = timer()
     val_loss = evaluate(transformer)
     print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, "f"Epoch time = {(end_time - start_time):.3f}s"))
+    
+    torch.save(
+        {
+            "epoch": epoch,
+            "model_state_dict": transformer.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "loss": train_loss,
+        },
+        f"{CKPT_DIR}/ckpt_{epoch}.pt",
+    )
 
 
 # function to generate output sequence using greedy algorithm
@@ -456,7 +497,7 @@ def translate(model: torch.nn.Module, src_sentence: str):
         model,  src, src_mask, max_len=num_tokens + 5, start_symbol=BOS_IDX).flatten()
     return " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(tgt_tokens.cpu().numpy()))).replace("<bos>", "").replace("<eos>", "")
 
-print(translate(transformer, "It is the county seat of Alfalfa County ."))
+print(translate(transformer, "If music be the food of love , play on ."))
 
 """References
 ==========
