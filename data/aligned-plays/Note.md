@@ -1,0 +1,1 @@
+These aligned Shakespeare plays are from Xu et al.'s research (see README for more information).
