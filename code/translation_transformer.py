@@ -11,7 +11,10 @@ from torchtext.vocab import build_vocab_from_iterator
 from typing import Iterable, List
 from spacy.lang.en import English
 import english_simple_sent_align as align
-import os
+from nltk.translate.bleu_score import sentence_bleu
+
+#added RT
+
 
 # for the folder of saved models
 CKPT_DIR = "./code/ckpt"
@@ -439,6 +442,16 @@ def translate(model: torch.nn.Module, src_sentence: str):
     tgt_tokens = greedy_decode(
         model,  src, src_mask, max_len=num_tokens + 5, start_symbol=BOS_IDX).flatten()
     return " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(tgt_tokens.cpu().numpy()))).replace("<bos>", "").replace("<eos>", "")
+
+###RT add
+##to_trans = "If music be the food of love , play on ."
+##translated_v = translate(transformer, to_trans)
+### I think the idea of the reference here might be a little funky
+### because like we probably only have one version we would call correct?
+### this should totally end as a helper function
+##bleu_score = sentence_bleu([to_trans.split()], translated_v.split())
+##print('BLEU score -> {}'.format(bleu_score)) 
+
 
 print(translate(transformer, "If music be the food of love , play on ."))
 
