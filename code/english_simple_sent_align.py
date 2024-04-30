@@ -45,14 +45,6 @@ def tokenize_sents(sents: list[str]) -> list[list[str]]:
         list_sent.append(sent.split(" "))
     return list_sent
 
-# partially from https://pytorch.org/text/stable/vocab.html#torchtext.vocab.vocab
-def create_token_count(token_list_list: list[list[str]]) -> dict:
-    total_list = []
-    for sent in token_list_list:
-        for token in sent:
-            total_list.append(token)
-    return Counter(total_list)
-
 def create_giant_token_list(token_list_list: list[list[str]]) -> list[str]:
     ''' creates a giant list of all the tokens in the entire set of sentences
     '''
