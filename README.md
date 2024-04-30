@@ -17,3 +17,5 @@ Harsh Jhamtani, Varun Gangal, Eduard Hovy, and Eric Nyberg. 2017. [Shakespearizi
 Wei Xu, Alan Ritter, Bill Dolan, Ralph Grishman, and Colin Cherry. 2012. [Paraphrasing for style](https://aclanthology.org/C12-1177/). In Proceedings of COLING 2012, pages 2899–2914, Mumbai, India. The COLING 2012 Organizing Committee.
 
 William Coster and David Kauchak. 2011. [Simple English Wikipedia: A new text simplification task](https://aclanthology.org/P11-2117). In Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human Language Technologies, pages 665–669, Portland, Oregon, USA. Association for Computational Linguistics.
+
+The (now) current link to Coster and Kauchak's dataset as of April 2024 is here: [http://www.cs.pomona.edu/~dkauchak/simplification/](http://www.cs.pomona.edu/~dkauchak/simplification/). The one cited in the article does not seem to work.
