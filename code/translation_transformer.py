@@ -442,7 +442,7 @@ def evaluate(model):
 """
 
 from timeit import default_timer as timer
-NUM_EPOCHS = 3
+NUM_EPOCHS = 5
 
 for epoch in range(next_epoch, NUM_EPOCHS+1):
     start_time = timer()
