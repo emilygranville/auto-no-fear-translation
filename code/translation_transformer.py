@@ -12,7 +12,7 @@ from typing import Iterable, List
 from spacy.lang.en import English
 import english_simple_sent_align as align
 import os
-from nltk.translate.bleu_score import sentence_bleu
+#from nltk.translate.bleu_score import sentence_bleu
 
 #added RT
 
@@ -454,7 +454,7 @@ def translate(model: torch.nn.Module, src_sentence: str):
 ##print('BLEU score -> {}'.format(bleu_score)) 
 
 
-print(translate(transformer, "If music be the food of love , play on ."))
+#print(translate(transformer, "If music be the food of love , play on ."))
 
 """References
 ==========

@@ -14,7 +14,7 @@ def save_tranlated_sents(f_name: str, sentences: list[str]):
 source_sents = shakes.get_og_sents()
 transformer, optimizer, next_epoch = base_trans.make_or_restore_model()
 translations = []
-for sent in source_sents[0:10]:
+for sent in source_sents:
     new_sent = base_trans.translate(transformer, sent)
     translations.append(new_sent)
 
