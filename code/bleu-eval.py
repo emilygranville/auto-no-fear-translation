@@ -9,9 +9,6 @@ BI_WEIGHT = 0.25
 TRI_WEIGHT = 0
 QUAD_WEIGHT = 0
 
-# list of token-sentences that we compare
-# SHAKES_OG_LIST = align.get_og_sents()
-
 RESULT_DIR = make_base.RES_DIR
 
 SHAKES_BASE_RESULT_FNAME = make_base.SHAKES_BASE_TRANS_FNAME
@@ -29,7 +26,7 @@ def compare_total_bleu_lists(ref: list[list[str]], pred: list[list[str]]) -> flo
     total = 0
     weights = (UNI_WEIGHT, BI_WEIGHT, TRI_WEIGHT, QUAD_WEIGHT)
     for i in range(0, ref_len):
-        total += sentence_bleu(ref[i], pred[i], weights=weights)
+        total += sentence_bleu([ref[i]], pred[i], weights=weights)
     
     return total / ref_len
 
@@ -42,7 +39,7 @@ def compare_total_bleu_tuples(combined: list[tuple[list[str], list[str]]]) -> fl
     total = 0
     weights = (UNI_WEIGHT, BI_WEIGHT, TRI_WEIGHT, QUAD_WEIGHT)
     for tup in combined:
-        total += sentence_bleu(tup[0], tup[1], weights=weights)
+        total += sentence_bleu([tup[0]], tup[1], weights=weights)
 
     return total/total_len
 
@@ -60,23 +57,28 @@ Shakespeare plays into the one with word embeddings:
     sentences and hand made translations
 '''
 manual_shakes_translation = compare_total_bleu_tuples(shakes.get_aligned_sent_tokens())
+print(f"manual shakespeare translation score,{manual_shakes_translation}")
 
 ''' the comparision between original shakespeare 
     sentences and automatic baseline translations
 '''
-base_pred_translations = shakes.get_sent_list(RESULT_DIR + SHAKES_BASE_RESULT_FNAME)
-base_pred_align = list(zip(shakes.get_og_sents(), base_pred_translations))
-base_auto_shakes_translation = compare_total_bleu_tuples(shakes.tokenize_sent_pairs(base_pred_align))
+shakes_base_pred_translations = shakes.get_sent_list(RESULT_DIR + SHAKES_BASE_RESULT_FNAME)
+shakes_base_pred_align = list(zip(shakes.get_og_sents(), shakes_base_pred_translations))
+base_auto_shakes_translation = compare_total_bleu_tuples(shakes.tokenize_sent_pairs(shakes_base_pred_align))
+print(f"baseline shakespeare translation prediction score,{base_auto_shakes_translation}")
 
 ''' the comparison between normal wiki sentences
     to hand made simple wiki sentences
 '''
 wiki_sent_pairs = normal_simple.tokenize_sent_pairs(normal_simple.sent_pairs("test"))
 manual_wiki_translation = compare_total_bleu_tuples(wiki_sent_pairs)
+print(f"manual wiki translation score,{manual_wiki_translation}")
 
 ''' the comparision between normal wiki sentences and
     automatic simple wiki sentences
 '''
 wiki_normal_tokens = normal_simple.tokenize_sents(normal_simple.get_sents(normal_simple.get_sent_dict(NORMAL_SENTENCE_FNAME)))
+wiki_normal_tokens = [tup[0] for tup in normal_simple.sent_pairs("test")]
 base_pred_tokens = shakes.tokenize_sent_list(shakes.get_sent_list(RESULT_DIR + WIKI_BASE_RESULT_FNAME))
 base_pred_wiki_translation = compare_total_bleu_lists(wiki_normal_tokens, base_pred_tokens)
+print(f"baseline wiki translation prediction score,{base_pred_wiki_translation}")
