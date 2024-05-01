@@ -55,6 +55,14 @@ def get_og_sents() -> list[str]:
         original_sent_list += get_sent_list(DATA_DIR + ORIGNAL_DIR + name + ORIGINAL_INDC + FILE_END)
     return original_sent_list
 
+def get_mod_sents() -> list[str]:
+    ''' gets a list of all the modern sentences
+    '''
+    modern_sent_list = []
+    for name in play_name_list:
+        modern_sent_list += get_sent_list(DATA_DIR + MODERN_DIR + name + MODERN_INDC + FILE_END)
+    return modern_sent_list
+
 def sent_pairs() -> list[tuple[str, str]]:
     ''' creates sents pairs with the source first and target second
         twelfth night is our testing play
@@ -66,7 +74,16 @@ def sent_pairs() -> list[tuple[str, str]]:
         modern_sent_list += get_sent_list(DATA_DIR + MODERN_DIR + name + MODERN_INDC + FILE_END)
     return list(zip(original_sent_list, modern_sent_list))
 
-def tokenize_sents(combined_sents: list[tuple[str, str]]) -> list[tuple[list[str], list[str]]]:
+def tokenize_sent_list(sents: list[str]) -> list[list[str]]:
+    token_list = []
+    for sentence in sents:
+        sent_token_list = []
+        for token in tokenizer(sentence):
+            sent_token_list.append(token.text)
+        token_list.append(sent_token_list)
+    return token_list
+
+def tokenize_sent_pairs(combined_sents: list[tuple[str, str]]) -> list[tuple[list[str], list[str]]]:
     ''' creates tokens for the aligned sentences
         returns a list of tuples where the first item is the list
         of tokens in the source sentence and the second item is the
@@ -85,3 +102,9 @@ def tokenize_sents(combined_sents: list[tuple[str, str]]) -> list[tuple[list[str
         
         token_tuple_list.append((og_sent_tokens, mod_sent_tokens))
     return token_tuple_list
+
+def get_aligned_sent_tokens():
+    ''' calls the above functions in 1 go to return
+        the tokens of the aligned sentences
+    '''
+    return tokenize_sent_pairs(sent_pairs())

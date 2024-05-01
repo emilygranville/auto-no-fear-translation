@@ -4,6 +4,8 @@ import math
 
 DATA_DIR = "data/"
 SIMPLE_ENGL_DIR = "simple-english/"
+NORMAL_FNAME = "normal.aligned"
+SIMPLE_FNAME = "simple.aligned"
 
 TRAIN_PERCENT = .8
 NON_TRAIN_PERCENT = .1
@@ -58,23 +60,23 @@ def give_tokens(lang: str) -> list[str]:
     '''creates the tokens in a way that the transformer can use it
     '''
     if lang == "en":
-        normal_sents = get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + "normal.aligned")
+        normal_sents = get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + NORMAL_FNAME)
         normal_tokens = tokenize_sents(get_sents(normal_sents))
         all_normal_tokens = create_giant_token_list(normal_tokens)
         return all_normal_tokens
     elif lang == "simple":
-        simple_sents = get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + "simple.aligned")
+        simple_sents = get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + SIMPLE_FNAME)
         simple_tokens = tokenize_sents(get_sents(simple_sents))
         all_simple_tokens = create_giant_token_list(simple_tokens)
         return all_simple_tokens
     else:
         print("Error")
 
-def sent_pairs(split: str) -> list[(str, str)]:
+def sent_pairs(split: str) -> list[tuple[str, str]]:
     ''' creates sents pairs with the source first and target second
     '''
-    normal_sents = get_sents(get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + "normal.aligned"))
-    simple_sents = get_sents(get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + "simple.aligned"))
+    normal_sents = get_sents(get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + NORMAL_FNAME))
+    simple_sents = get_sents(get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + SIMPLE_FNAME))
     entire_list = list(zip(normal_sents, simple_sents))
     random.Random(RAND_SEED).shuffle(entire_list)
     
@@ -87,3 +89,30 @@ def sent_pairs(split: str) -> list[(str, str)]:
         return entire_list[train_len:non_train_len]
     else:
         return entire_list[non_train_len:]
+    
+def tokenize_sent_pairs(combined_sents: list[tuple[str, str]]) -> list[tuple[list[str], list[str]]]:
+    ''' given a list of sentence pairs (list of tuples of sentences),
+        creates a list of tokenizes sentence pairs
+        (list of tuples of a list of strings)
+    '''
+    token_tuple_list = []
+    for line in combined_sents:
+        norm_sent_tokens = []
+        for token in line[0].split(" "):
+            norm_sent_tokens.append(token)
+        
+        simple_sent_tokens = []
+        for token in line[0].split(" "):
+            simple_sent_tokens.append(token)
+        
+        token_tuple_list.append((norm_sent_tokens, simple_sent_tokens))
+    return token_tuple_list
+
+def get_tokenized_sents(key: str):
+    ''' creates an easy way to get the tokenized sentences for
+        one file
+    '''
+    if key == "normal":
+        return tokenize_sents(get_sents(get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + NORMAL_FNAME)))
+    else:
+        return tokenize_sents(get_sents(get_sent_dict(DATA_DIR + SIMPLE_ENGL_DIR + SIMPLE_FNAME)))
