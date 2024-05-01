@@ -47,6 +47,14 @@ def get_sent_list(f_name) -> list[str]:
             sent_list.append(line.replace("\n", ""))
         return sent_list
 
+def get_og_sents() -> list[str]:
+    ''' gets a list of all the original sentences
+    '''
+    original_sent_list = []
+    for name in play_name_list:
+        original_sent_list += get_sent_list(DATA_DIR + ORIGNAL_DIR + name + ORIGINAL_INDC + FILE_END)
+    return original_sent_list
+
 def sent_pairs() -> list[tuple[str, str]]:
     ''' creates sents pairs with the source first and target second
         twelfth night is our testing play
