@@ -5,8 +5,8 @@ import pandas as pd
 import numpy as np
 maxInt = sys.maxsize
 
-data_dir = "data/"
-embed_dir = "dictionary-mappings/short-embeddings/"
+DATA_DIR = "data/"
+EMBED_DIR = "dictionary-mappings/short-embeddings/"
 
 # from https://stackoverflow.com/questions/15063936/csv-error-field-larger-than-field-limit-131072
 while True:
@@ -58,5 +58,5 @@ def get_word_embeddings(dir_name) -> dict:
         
     return total_dictionary
 
-embeddings = get_word_embeddings(data_dir + embed_dir)
+embeddings = get_word_embeddings(DATA_DIR + EMBED_DIR)
 print("length: "+str(len(embeddings.keys())))
