@@ -12,13 +12,12 @@ from typing import Iterable, List
 from spacy.lang.en import English
 import english_simple_sent_align as align
 import os
-#from nltk.translate.bleu_score import sentence_bleu
 
 #added RT
 
 
 # for the folder of saved models
-CKPT_DIR = "./code/ckpt"
+CKPT_DIR = "./code/ckpt/baseline"
 
 # for switching between different lists of sentences
 TRAIN_STR = "train" # make sure that the list is also shuffled before chaging back to "train" (in sent_pairs)
@@ -454,7 +453,7 @@ def translate(model: torch.nn.Module, src_sentence: str):
 ##print('BLEU score -> {}'.format(bleu_score)) 
 
 
-#print(translate(transformer, "If music be the food of love , play on ."))
+print(translate(transformer, "If music be the food of love , play on ."))
 
 """References
 ==========

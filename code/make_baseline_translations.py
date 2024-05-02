@@ -1,4 +1,4 @@
-import translation_transformer as base_trans
+import baseline_translation_transformer as base_trans
 import loading_shakespeare as shakes
 import english_simple_sent_align as normal_simple
 
