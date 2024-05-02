@@ -4,8 +4,8 @@ import english_simple_sent_align as normal_simple
 import make_baseline_translations as make_base
 
 # weights
-UNI_WEIGHT = 0.25
-BI_WEIGHT = 0.25
+UNI_WEIGHT = 0.5
+BI_WEIGHT = 0.5
 TRI_WEIGHT = 0
 QUAD_WEIGHT = 0
 
