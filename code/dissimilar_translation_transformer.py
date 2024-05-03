@@ -511,10 +511,10 @@ def rerank_and_top(potential_list, original):
 ##bleu_score = sentence_bleu([to_trans.split()], translated_v.split())
 ##print('BLEU score -> {}'.format(bleu_score)) 
 
-
+'''
 poss_list = run_ten_times("If music be the food of love , play on .")
 top = rerank_and_top(poss_list, "If music be the food of love , play on .")
-print(top)
+print(top)'''
 
 """References
 ==========
