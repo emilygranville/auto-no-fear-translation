@@ -97,7 +97,7 @@ def tokenize_sent_pairs(combined_sents: list[tuple[str, str]]) -> list[tuple[lis
             og_sent_tokens.append(token.text)
         
         mod_sent_tokens = []
-        for token in tokenizer(line[0]):
+        for token in tokenizer(line[1]):
             mod_sent_tokens.append(token.text)
         
         token_tuple_list.append((og_sent_tokens, mod_sent_tokens))
