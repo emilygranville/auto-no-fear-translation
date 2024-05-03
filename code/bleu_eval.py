@@ -1,7 +1,7 @@
 from nltk.translate.bleu_score import sentence_bleu
 import loading_shakespeare as shakes
 import english_simple_sent_align as normal_simple
-import make_baseline_translations as make_base
+#import make_baseline_translations as make_base
 
 # weights
 UNI_WEIGHT = 0.5
@@ -9,10 +9,9 @@ BI_WEIGHT = 0.5
 TRI_WEIGHT = 0
 QUAD_WEIGHT = 0
 
-RESULT_DIR = make_base.RES_DIR
-
-SHAKES_BASE_RESULT_FNAME = make_base.SHAKES_BASE_TRANS_FNAME
-WIKI_BASE_RESULT_FNAME = make_base.WIKI_BASE_TRANS_FNAME
+RESULT_DIR = "./results/"
+SHAKES_BASE_RESULT_FNAME = "shakes_baseline_translation_sents.txt"
+WIKI_BASE_RESULT_FNAME = "wiki_baseline_translation_sents.txt"
 NORMAL_SENTENCE_FNAME = normal_simple.DATA_DIR + normal_simple.SIMPLE_ENGL_DIR + normal_simple.NORMAL_FNAME
 
 def compare_total_bleu_lists(ref: list[list[str]], pred: list[list[str]]) -> float:
@@ -57,7 +56,15 @@ Shakespeare plays into the one with word embeddings:
     sentences and hand made translations
 '''
 manual_shakes_translation = compare_total_bleu_tuples(shakes.get_aligned_sent_tokens())
-print(f"manual shakespeare translation score,{manual_shakes_translation}")
+print("manual shakespeare translation score: ", manual_shakes_translation)
+
+#for i in range(0, 10):
+#    print(i)
+#    print("Shake og: ", man_aligned_sents[i][0])
+#    print("Shake no fear: ", man_aligned_sents[i][1])
+#    print(sentence_bleu([man_aligned_sents[i][0]], 
+#                        man_aligned_sents[i][1], 
+#                        weights=(0.4, 0.4, 0.15, 0.05)))
 
 ''' the comparision between original shakespeare 
     sentences and automatic baseline translations
@@ -65,7 +72,16 @@ print(f"manual shakespeare translation score,{manual_shakes_translation}")
 shakes_base_pred_translations = shakes.get_sent_list(RESULT_DIR + SHAKES_BASE_RESULT_FNAME)
 shakes_base_pred_align = list(zip(shakes.get_og_sents(), shakes_base_pred_translations))
 base_auto_shakes_translation = compare_total_bleu_tuples(shakes.tokenize_sent_pairs(shakes_base_pred_align))
-print(f"baseline shakespeare translation prediction score,{base_auto_shakes_translation}")
+print(f"baseline shakespeare translation prediction score: ", base_auto_shakes_translation)
+
+
+#for i in range(0, 10):
+#    print(i)
+#    print("Shake og: ", shakes_base_pred_align[i][0])
+#    print("Shake trans: ", shakes_base_pred_align[i][1])
+#    print(sentence_bleu([shakes_base_pred_align[i][0]], 
+#                        shakes_base_pred_align[i][1], 
+#                        weights=(0.4, 0.4, 0.15, 0.05)))
 
 ''' the comparison between normal wiki sentences
     to hand made simple wiki sentences
