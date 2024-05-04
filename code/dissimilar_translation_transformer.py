@@ -445,7 +445,7 @@ def one_of_top_3_decode(model, src, src_mask, max_len, start_symbol):
     return ys
 
 
-# https://www.scaler.com/topics/levenshtein-distance-python/#
+# from https://www.scaler.com/topics/levenshtein-distance-python/
 def levenshteinDistance(A, B):
     N, M = len(A), len(B)
     # Create an array of size NxM
