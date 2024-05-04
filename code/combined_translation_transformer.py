@@ -12,8 +12,6 @@ from typing import Iterable, List
 import english_simple_sent_align as align
 import loading_shakespeare as shakes
 import os
-from spacy.tokenizer import Tokenizer
-from spacy.lang.en import English
 
 #added RT
 
@@ -43,12 +41,8 @@ python -m spacy download de_core_news_sm
 
 """
 
-
-nlp = English()
-tokenizer = Tokenizer(nlp.vocab)
-
-token_transform[SRC_LANGUAGE] = tokenizer
-token_transform[TGT_LANGUAGE] = tokenizer
+token_transform[SRC_LANGUAGE] = get_tokenizer("basic_english")
+token_transform[TGT_LANGUAGE] = get_tokenizer("basic_english")
 
 # helper function to yield list of tokens
 def yield_tokens(data_iter: Iterable, language: str):
