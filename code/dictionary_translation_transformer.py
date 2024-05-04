@@ -64,7 +64,7 @@ UNK_IDX, PAD_IDX, BOS_IDX, EOS_IDX = 0, 1, 2, 3
 # Make sure the tokens are in order of their indices to properly insert them in vocab
 special_symbols = ['<unk>', '<pad>', '<bos>', '<eos>']
 
-train_iter = align.sent_pairs(TRAIN_STR)[0:7500]
+train_iter = align.sent_pairs(TRAIN_STR)
 
 # from https://github.com/pytorch/text/issues/722#issuecomment-609880042
 dictionary_embeddings = Vectors(name=(DICTIONARY_EMBED_DIR + DICTIONARY_EMBED_FNAME))
@@ -139,21 +139,34 @@ class TokenEmbedding(nn.Module):
         return self.embedding(tokens.long()) * math.sqrt(self.emb_size)
 
 # Thank you professor Gordon (at Vassar College) for your help with this
+# This class includes code adapted from Anthropic Claude.
 class SrcTokenEmbedding(nn.Module):
-    """Using pretrained embeddings"""
+    """Helper module to convert tensor of input indices into corresponding
+    tensor of token embeddings, using pretrained embeddings.
+    """
 
     def __init__(self, vocab_size: int, emb_size):
         super(SrcTokenEmbedding, self).__init__()
 
-        # Get the embedding matrix from the vocab.Vectors object
+        # Create a new Embedding layer
         self.embedding = nn.Embedding(vocab_size, emb_size)
 
-        # Convert pre-trained vectors to Parameter and assign
-        self.embedding.weight = nn.Parameter(dictionary_embeddings.vectors)
+        # Initialize the Embedding layer with the pretrained embeddings
+        pretrained_embeddings = dictionary_embeddings.vectors
 
-        # Check compatibility with expected embedding size
-        if self.embedding.weight.size(1) != emb_size:
-            raise ValueError(f"Pretrained embedding size ({self.embedding.weight.size(1)}) doesn't match expected size ({emb_size})")
+        # Build a weight tensor with the same shape as the pretrained embeddings
+        weight = torch.zeros(
+            len(vocab_transform[SRC_LANGUAGE]),
+            pretrained_embeddings.size(1)
+        )
+
+        # Copy the pretrained embeddings into the weight tensor
+        for i, token in enumerate(vocab_transform[SRC_LANGUAGE].get_itos()):
+            if token in dictionary_embeddings.stoi:
+                weight[i] = dictionary_embeddings[dictionary_embeddings.stoi[token]]
+
+        # Assign the weight tensor to the Embedding layer
+        self.embedding.weight = nn.Parameter(weight)
 
         self.emb_size = emb_size
 
@@ -283,7 +296,7 @@ def make_or_restore_model():
 torch.manual_seed(0)
 
 # SRC is source and TGT is target
-SRC_VOCAB_SIZE = len(vocab_transform[SRC_LANGUAGE]) + len(dictionary_embeddings)
+SRC_VOCAB_SIZE = len(vocab_transform[SRC_LANGUAGE])
 TGT_VOCAB_SIZE = len(vocab_transform[TGT_LANGUAGE])
 
 # i will assume these numbers are fine and have no particular stuff we need to change
