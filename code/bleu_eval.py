@@ -65,6 +65,13 @@ print("translation type,input data,bleu score")
 manual_shakes_translation = compare_total_bleu_tuples(shakes.get_aligned_sent_tokens())
 print(f"manual,shakespeare,{manual_shakes_translation}")
 
+''' the comparison between normal wiki sentences
+    to hand made simple wiki sentences
+'''
+wiki_sent_pairs = normal_simple.tokenize_sent_pairs(normal_simple.sent_pairs("test"))
+manual_wiki_translation = compare_total_bleu_tuples(wiki_sent_pairs)
+print(f"manual,wiki,{manual_wiki_translation}")
+
 #for i in range(0, 10):
 #    print(i)
 #    print("Shake og: ", man_aligned_sents[i][0])
@@ -89,13 +96,6 @@ print(f"baseline model,shakespeare,{base_auto_shakes_translation}")
 #    print(sentence_bleu([shakes_base_pred_align[i][0]], 
 #                        shakes_base_pred_align[i][1], 
 #                        weights=(0.4, 0.4, 0.15, 0.05)))
-
-''' the comparison between normal wiki sentences
-    to hand made simple wiki sentences
-'''
-wiki_sent_pairs = normal_simple.tokenize_sent_pairs(normal_simple.sent_pairs("test"))
-manual_wiki_translation = compare_total_bleu_tuples(wiki_sent_pairs)
-print(f"manual,wiki,{manual_wiki_translation}")
 
 ''' the comparision between normal wiki sentences and
     baseline automatic simple wiki sentences
