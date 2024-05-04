@@ -2,3 +2,4 @@ code/ckpt/
 code/first-ckpt/
 code/test-ckpt/
 code/__pycache__/
+.vector_cache/
