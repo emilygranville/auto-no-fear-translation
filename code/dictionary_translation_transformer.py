@@ -64,7 +64,7 @@ UNK_IDX, PAD_IDX, BOS_IDX, EOS_IDX = 0, 1, 2, 3
 # Make sure the tokens are in order of their indices to properly insert them in vocab
 special_symbols = ['<unk>', '<pad>', '<bos>', '<eos>']
 
-train_iter = align.sent_pairs(TRAIN_STR)
+train_iter = align.sent_pairs(TRAIN_STR)[0:7500]
 
 # from https://github.com/pytorch/text/issues/722#issuecomment-609880042
 dictionary_embeddings = Vectors(name=(DICTIONARY_EMBED_DIR + DICTIONARY_EMBED_FNAME))
@@ -103,7 +103,8 @@ import torch
 import torch.nn as nn
 from torch.nn import Transformer
 import math
-DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+DEVICE = torch.device('cpu')
 
 # step 1. embedding layer
 # helper Module that adds positional encoding to the token embedding to introduce a notion of word order.
