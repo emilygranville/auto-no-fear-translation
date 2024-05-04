@@ -55,11 +55,13 @@ Normal wiki in dissimilar translator:
 Shakespeare plays into the one with word embeddings:
 '''
 
+print("translation type,input data,bleu score")
+
 ''' the comparison between original shakespeare
     sentences and hand made translations
 '''
 manual_shakes_translation = compare_total_bleu_tuples(shakes.get_aligned_sent_tokens())
-print("manual shakespeare translation score: ", manual_shakes_translation)
+print(f"manual,shakespeare,{manual_shakes_translation}")
 
 #for i in range(0, 10):
 #    print(i)
@@ -75,7 +77,7 @@ print("manual shakespeare translation score: ", manual_shakes_translation)
 shakes_base_pred_translations = shakes.get_sent_list(RESULT_DIR + SHAKES_BASE_RESULT_FNAME)
 shakes_base_pred_align = list(zip(shakes.get_og_sents(), shakes_base_pred_translations))
 base_auto_shakes_translation = compare_total_bleu_tuples(shakes.tokenize_sent_pairs(shakes_base_pred_align))
-print(f"baseline shakespeare translation prediction score: ", base_auto_shakes_translation)
+print(f"baseline model,shakespeare,{base_auto_shakes_translation}")
 
 
 #for i in range(0, 10):
@@ -91,7 +93,7 @@ print(f"baseline shakespeare translation prediction score: ", base_auto_shakes_t
 '''
 wiki_sent_pairs = normal_simple.tokenize_sent_pairs(normal_simple.sent_pairs("test"))
 manual_wiki_translation = compare_total_bleu_tuples(wiki_sent_pairs)
-print(f"manual wiki translation score,{manual_wiki_translation}")
+print(f"manual,wiki,{manual_wiki_translation}")
 
 ''' the comparision between normal wiki sentences and
     baseline automatic simple wiki sentences
@@ -100,7 +102,7 @@ wiki_normal_tokens = normal_simple.tokenize_sents(normal_simple.get_sents(normal
 wiki_normal_tokens = [tup[0] for tup in normal_simple.sent_pairs("test")]
 base_pred_tokens = shakes.tokenize_sent_list(shakes.get_sent_list(RESULT_DIR + WIKI_BASE_RESULT_FNAME))
 base_pred_wiki_translation = compare_total_bleu_lists(wiki_normal_tokens, base_pred_tokens)
-print(f"baseline wiki translation prediction score,{base_pred_wiki_translation}")
+print(f"baseline model,wiki,{base_pred_wiki_translation}")
 
 ''' the comparision between original shakespeare 
     sentences and automatic dissimilar translations
@@ -108,7 +110,7 @@ print(f"baseline wiki translation prediction score,{base_pred_wiki_translation}"
 shakes_dissim_pred_translations = shakes.get_sent_list(RESULT_DIR + SHAKES_DISSIM_RESULT_FNAME)
 shakes_dissim_pred_align = list(zip(shakes.get_og_sents(), shakes_dissim_pred_translations))
 dissim_auto_shakes_translation = compare_total_bleu_tuples(shakes.tokenize_sent_pairs(shakes_dissim_pred_align))
-print(f"dissimilar shakespeare translation prediction score: ", dissim_auto_shakes_translation)
+print(f"dissimilar model,shakespeare,{dissim_auto_shakes_translation}")
 
 ''' the comparision between normal wiki sentences and
     dissimilar automatic simple wiki sentences
@@ -117,4 +119,4 @@ wiki_normal_tokens = normal_simple.tokenize_sents(normal_simple.get_sents(normal
 wiki_normal_tokens = [tup[0] for tup in normal_simple.sent_pairs("test")]
 dissim_pred_tokens = shakes.tokenize_sent_list(shakes.get_sent_list(RESULT_DIR + WIKI_DISSIM_RESULT_FNAME))
 dissim_pred_wiki_translation = compare_total_bleu_lists(wiki_normal_tokens, dissim_pred_tokens)
-print(f"dissimilar wiki translation prediction score,{dissim_pred_wiki_translation}")
+print(f"dissimilar model,wiki,{dissim_pred_wiki_translation}")
