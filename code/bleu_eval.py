@@ -15,6 +15,8 @@ WIKI_BASE_RESULT_FNAME = "wiki_baseline_translation_sents.txt"
 NORMAL_SENTENCE_FNAME = normal_simple.DATA_DIR + normal_simple.SIMPLE_ENGL_DIR + normal_simple.NORMAL_FNAME
 SHAKES_DISSIM_RESULT_FNAME = "shakes_dissimilar_translation_sents.txt"
 WIKI_DISSIM_RESULT_FNAME = "wiki_dissimilar_translation_sents.txt"
+SHAKES_COMBINED_RESULT_FNAME = "shakes_combined_translation_sents.txt"
+WIKI_COMBINED_RESULT_FNAME = "wiki_combined_translation_sents.txt"
 
 def compare_total_bleu_lists(ref: list[list[str]], pred: list[list[str]]) -> float:
     ''' gets average bleu score for the sentences when they are two
@@ -120,3 +122,21 @@ wiki_normal_tokens = [tup[0] for tup in normal_simple.sent_pairs("test")]
 dissim_pred_tokens = shakes.tokenize_sent_list(shakes.get_sent_list(RESULT_DIR + WIKI_DISSIM_RESULT_FNAME))
 dissim_pred_wiki_translation = compare_total_bleu_lists(wiki_normal_tokens, dissim_pred_tokens)
 print(f"dissimilar model,wiki,{dissim_pred_wiki_translation}")
+
+''' the comparision between original shakespeare 
+    sentences and automatic combined translations
+'''
+shakes_combined_pred_translations = shakes.get_sent_list(RESULT_DIR + SHAKES_COMBINED_RESULT_FNAME)
+shakes_test_sents = shakes.get_sent_list(shakes.DATA_DIR + shakes.ORIGNAL_DIR + shakes.TESTING_PLAY_NAME + shakes.ORIGINAL_INDC + shakes.FILE_END)
+shakes_combined_pred_align = list(zip(shakes_test_sents, shakes_combined_pred_translations))
+combined_auto_shakes_translation = compare_total_bleu_tuples(shakes.tokenize_sent_pairs(shakes_combined_pred_align))
+print(f"combined model,shakespeare,{combined_auto_shakes_translation}")
+
+''' the comparision between normal wiki sentences and
+    combined automatic simple wiki sentences
+'''
+wiki_normal_tokens = normal_simple.tokenize_sents(normal_simple.get_sents(normal_simple.get_sent_dict(NORMAL_SENTENCE_FNAME)))
+wiki_normal_tokens = [tup[0] for tup in normal_simple.sent_pairs("test")]
+combined_pred_tokens = shakes.tokenize_sent_list(shakes.get_sent_list(RESULT_DIR + WIKI_COMBINED_RESULT_FNAME))
+combined_pred_wiki_translation = compare_total_bleu_lists(wiki_normal_tokens, combined_pred_tokens)
+print(f"combined model,wiki,{combined_pred_wiki_translation}")
