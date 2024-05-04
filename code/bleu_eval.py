@@ -1,7 +1,6 @@
 from nltk.translate.bleu_score import sentence_bleu
 import loading_shakespeare as shakes
 import english_simple_sent_align as normal_simple
-#import make_baseline_translations as make_base
 
 # weights
 UNI_WEIGHT = 0.5
@@ -17,6 +16,8 @@ SHAKES_DISSIM_RESULT_FNAME = "shakes_dissimilar_translation_sents.txt"
 WIKI_DISSIM_RESULT_FNAME = "wiki_dissimilar_translation_sents.txt"
 SHAKES_COMBINED_RESULT_FNAME = "shakes_combined_translation_sents.txt"
 WIKI_COMBINED_RESULT_FNAME = "wiki_combined_translation_sents.txt"
+SHAKES_DICT_RESULT_FNAME = "shakes_dict_translation_sents.txt"
+WIKI_DICT_RESULT_FNAME = "wiki_dict_translation_sents.txt"
 
 def compare_total_bleu_lists(ref: list[list[str]], pred: list[list[str]]) -> float:
     ''' gets average bleu score for the sentences when they are two
@@ -53,8 +54,11 @@ Actual wiki aligned sentences:                                  manual_wiki_tran
 Normal wiki into baseline translator:                           base_pred_wiki_translation
 Shakespeare plays into the baseline:                            base_auto_shakes_translation
 Shakespeare plays into the sentence distance thing:             dissim_auto_shakes_translation
-Normal wiki in dissimilar translator:                           
-Shakespeare plays into the one with word embeddings:
+Normal wiki in dissimilar translator:                           dissim_auto_shakes_translation
+Shakespeare plays into the combined:                            combined_auto_shakes_translation
+Normal wiki into the combined:                                  combined_pred_wiki_translation
+Shakespeare plays into the one with word embeddings:            dictionary_auto_shakes_translation
+Normal wiki into the one with word embeddings:                  dictionary_pred_wiki_translation
 '''
 
 print("translation type,input data,bleu score")
@@ -100,8 +104,7 @@ print(f"baseline model,shakespeare,{base_auto_shakes_translation}")
 ''' the comparision between normal wiki sentences and
     baseline automatic simple wiki sentences
 '''
-wiki_normal_tokens = normal_simple.tokenize_sents(normal_simple.get_sents(normal_simple.get_sent_dict(NORMAL_SENTENCE_FNAME)))
-wiki_normal_tokens = [tup[0] for tup in normal_simple.sent_pairs("test")]
+wiki_normal_tokens = normal_simple.tokenize_sents([tup[0] for tup in normal_simple.sent_pairs("test")])
 base_pred_tokens = shakes.tokenize_sent_list(shakes.get_sent_list(RESULT_DIR + WIKI_BASE_RESULT_FNAME))
 base_pred_wiki_translation = compare_total_bleu_lists(wiki_normal_tokens, base_pred_tokens)
 print(f"baseline model,wiki,{base_pred_wiki_translation}")
@@ -117,8 +120,6 @@ print(f"dissimilar model,shakespeare,{dissim_auto_shakes_translation}")
 ''' the comparision between normal wiki sentences and
     dissimilar automatic simple wiki sentences
 '''
-wiki_normal_tokens = normal_simple.tokenize_sents(normal_simple.get_sents(normal_simple.get_sent_dict(NORMAL_SENTENCE_FNAME)))
-wiki_normal_tokens = [tup[0] for tup in normal_simple.sent_pairs("test")]
 dissim_pred_tokens = shakes.tokenize_sent_list(shakes.get_sent_list(RESULT_DIR + WIKI_DISSIM_RESULT_FNAME))
 dissim_pred_wiki_translation = compare_total_bleu_lists(wiki_normal_tokens, dissim_pred_tokens)
 print(f"dissimilar model,wiki,{dissim_pred_wiki_translation}")
@@ -135,8 +136,23 @@ print(f"combined model,shakespeare,{combined_auto_shakes_translation}")
 ''' the comparision between normal wiki sentences and
     combined automatic simple wiki sentences
 '''
-wiki_normal_tokens = normal_simple.tokenize_sents(normal_simple.get_sents(normal_simple.get_sent_dict(NORMAL_SENTENCE_FNAME)))
-wiki_normal_tokens = [tup[0] for tup in normal_simple.sent_pairs("test")]
 combined_pred_tokens = shakes.tokenize_sent_list(shakes.get_sent_list(RESULT_DIR + WIKI_COMBINED_RESULT_FNAME))
 combined_pred_wiki_translation = compare_total_bleu_lists(wiki_normal_tokens, combined_pred_tokens)
 print(f"combined model,wiki,{combined_pred_wiki_translation}")
+
+''' the comparision between original shakespeare 
+    sentences and automatic translations with the
+    pretrained embeddings
+'''
+shakes_dictionary_pred_translations = shakes.get_sent_list(RESULT_DIR + SHAKES_DICT_RESULT_FNAME)
+shakes_dictionary_pred_align = list(zip(shakes.get_og_sents(), shakes_dictionary_pred_translations))
+dictionary_auto_shakes_translation = compare_total_bleu_tuples(shakes.tokenize_sent_pairs(shakes_dictionary_pred_align))
+print(f"dictionary model,shakespeare,{dictionary_auto_shakes_translation}")
+
+''' the comparision between normal wiki sentences and
+    automatic simple wiki sentences with the pretrained
+    embeddings
+'''
+dictionary_pred_tokens = shakes.tokenize_sent_list(shakes.get_sent_list(RESULT_DIR + WIKI_DICT_RESULT_FNAME))
+dictionary_pred_wiki_translation = compare_total_bleu_lists(wiki_normal_tokens, dictionary_pred_tokens)
+print(f"dictionary model,wiki,{dictionary_pred_wiki_translation}")
