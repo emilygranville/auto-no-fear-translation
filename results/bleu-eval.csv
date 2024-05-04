@@ -1,7 +1,9 @@
 translation type,input data,bleu score
 manual,shakespeare,0.21563740400614853
-baseline model,shakespeare,0.2146162959311411
 manual,wiki,0.9999403697078115
+baseline model,shakespeare,0.2146162959311411
 baseline model,wiki,3.172277067651324e-05
 dissimilar model,shakespeare,0.2718450154798229
 dissimilar model,wiki,3.378948308831701e-05
+combined model,shakespeare,0.09448585355809508
+combined model,wiki,0.0002614252908633995

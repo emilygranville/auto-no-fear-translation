@@ -32,3 +32,6 @@ def wiki_into_combined():
         new_sent = combined_trans.translate(transformer, sent[0])
         translations.append(new_sent)
     save_tranlated_sents(RES_DIR + WIKI_BASE_TRANS_FNAME, translations)
+
+#shakespeare_into_combined()
+wiki_into_combined()

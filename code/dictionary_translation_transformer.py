@@ -282,8 +282,8 @@ def make_or_restore_model():
 
 torch.manual_seed(0)
 
-# RC is source and TGT is target
-SRC_VOCAB_SIZE = len(vocab_transform[SRC_LANGUAGE])
+# SRC is source and TGT is target
+SRC_VOCAB_SIZE = len(vocab_transform[SRC_LANGUAGE]) + len(dictionary_embeddings)
 TGT_VOCAB_SIZE = len(vocab_transform[TGT_LANGUAGE])
 
 # i will assume these numbers are fine and have no particular stuff we need to change
