@@ -18,7 +18,7 @@ nlp = English()
 tokenizer = Tokenizer(nlp.vocab)
 
 # names of the play based on the file name
-play_name_list = [
+PLAY_NAME_LIST_ALL = [
     "antony-and-cleopatra",
     "asyoulikeit",
     "errors",
@@ -38,6 +38,28 @@ play_name_list = [
     "twelfthnight"
 ]
 
+# names of the play based on the file name
+TRAINING_PLAYS_LIST = [
+    "asyoulikeit",
+    "errors",
+    "hamlet",
+    "henryv",
+    "juliuscaesar",
+    "lear",
+    "macbeth",
+    "merchant",
+    "msnd",
+    "muchado",
+    "othello",
+    "richardiii",
+    "romeojuliet",
+    "shrew",
+    "tempest",
+]
+
+TESTING_PLAY_NAME = "antony-and-cleopatra"
+VALID_PLAY_NAME = "twelfthnight"
+
 def get_sent_list(f_name) -> list[str]:
     ''' gets the aligned file and converts it to a list of sentences
     '''
@@ -51,7 +73,7 @@ def get_og_sents() -> list[str]:
     ''' gets a list of all the original sentences
     '''
     original_sent_list = []
-    for name in play_name_list:
+    for name in PLAY_NAME_LIST_ALL:
         original_sent_list += get_sent_list(DATA_DIR + ORIGNAL_DIR + name + ORIGINAL_INDC + FILE_END)
     return original_sent_list
 
@@ -59,19 +81,46 @@ def get_mod_sents() -> list[str]:
     ''' gets a list of all the modern sentences
     '''
     modern_sent_list = []
-    for name in play_name_list:
+    for name in PLAY_NAME_LIST_ALL:
         modern_sent_list += get_sent_list(DATA_DIR + MODERN_DIR + name + MODERN_INDC + FILE_END)
     return modern_sent_list
 
 def sent_pairs() -> list[tuple[str, str]]:
     ''' creates sents pairs with the source first and target second
-        twelfth night is our testing play
+        for all sentences
     '''
     original_sent_list = []
     modern_sent_list = []
-    for name in play_name_list:
+    for name in PLAY_NAME_LIST_ALL:
         original_sent_list += get_sent_list(DATA_DIR + ORIGNAL_DIR + name + ORIGINAL_INDC + FILE_END)
         modern_sent_list += get_sent_list(DATA_DIR + MODERN_DIR + name + MODERN_INDC + FILE_END)
+    return list(zip(original_sent_list, modern_sent_list))
+
+def training_sent_pairs() -> list[tuple[str, str]]:
+    ''' creates sents pairs with the source first and target second
+        for our training data (not antony and cleopatra)
+    '''
+    original_sent_list = []
+    modern_sent_list = []
+    for name in TRAINING_PLAYS_LIST:
+        original_sent_list += get_sent_list(DATA_DIR + ORIGNAL_DIR + name + ORIGINAL_INDC + FILE_END)
+        modern_sent_list += get_sent_list(DATA_DIR + MODERN_DIR + name + MODERN_INDC + FILE_END)
+    return list(zip(original_sent_list, modern_sent_list))
+
+def testing_sent_pairs() -> list[tuple[str, str]]:
+    ''' creates sents pairs with the source first and target second
+        for our testing play (antony and cleopatra)
+    '''
+    original_sent_list = get_sent_list(DATA_DIR + ORIGNAL_DIR + TESTING_PLAY_NAME + ORIGINAL_INDC + FILE_END)
+    modern_sent_list = get_sent_list(DATA_DIR + MODERN_DIR + TESTING_PLAY_NAME + MODERN_INDC + FILE_END)
+    return list(zip(original_sent_list, modern_sent_list))
+
+def valid_sent_pairs() -> list[tuple[str, str]]:
+    ''' creates sents pairs with the source first and target second
+        for our validation play (twelfth night)
+    '''
+    original_sent_list = get_sent_list(DATA_DIR + ORIGNAL_DIR + VALID_PLAY_NAME + ORIGINAL_INDC + FILE_END)
+    modern_sent_list = get_sent_list(DATA_DIR + MODERN_DIR + VALID_PLAY_NAME + MODERN_INDC + FILE_END)
     return list(zip(original_sent_list, modern_sent_list))
 
 def tokenize_sent_list(sents: list[str]) -> list[list[str]]:
