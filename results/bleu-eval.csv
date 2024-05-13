@@ -7,3 +7,5 @@ dissimilar model,shakespeare,0.2718450154798229
 dissimilar model,wiki,0.61059789650552
 combined model,shakespeare,0.09448585355809508
 combined model,wiki,0.12308564755043208
+dictionary model,shakespeare,0.0945400175567567
+dictionary model,wiki,0.322935777888588
